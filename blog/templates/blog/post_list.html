@@ -1,0 +1,134 @@
+
+{% extends "blog/base.html" %}
+
+{% block title %}Latest posts | Djangoblog{% endblock %}
+
+{% block content %}
+
+<section class="posts-section">
+
+ <div class="section-heading">
+<p class="eyebrow">THE BLOG</p>
+        <h1>Latest posts</h1>
+        <p class="section-description">
+            Thoughts, stories, and ideas.
+        </p>
+    </div>
+
+    <!-- Blog Posts -->
+    <div class="post-grid">
+
+        {% for post in post_list %}
+
+        <article class="post-card">
+
+            <!-- Cover Image -->
+            {% if post.cover_image %}
+                <img
+                    src="{{ post.cover_image.url }}"
+                    class="card_image_top"
+                    alt="{{ post.title }}"
+                >
+            {% endif %}
+
+
+            <div class="post-card-content">
+
+                <p class="post-label">
+                    BLOG POST
+                </p>
+
+                <h2>
+                    <a href="{% url 'post_detail' slug=post.slug %}">
+                        {{ post.title }}
+                    </a>
+                </h2>
+
+                <p class="post-excerpt">
+                    {{ post.content|truncatewords:30 }}
+                </p>
+
+                <a
+                    class="read-more"
+                    href="{% url 'post_detail' slug=post.slug %}"
+                >
+                    Read post
+                    <span aria-hidden="true">&rarr;</span>
+                </a>
+
+            </div>
+
+        </article>
+
+        {% empty %}
+
+            <p class="empty-message">
+                There are no posts yet.
+            </p>
+
+        {% endfor %}
+
+    </div>
+
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+
+    <div class="pagination">
+
+        <!-- Previous -->
+        {% if page_obj.has_previous %}
+
+            <a
+                class="pagination-link"
+                href="?page={{ page_obj.previous_page_number }}"
+            >
+                &larr; Previous
+            </a>
+
+        {% endif %}
+
+
+        <!-- Page Numbers -->
+        {% for num in page_obj.paginator.page_range %}
+
+            {% if page_obj.number == num %}
+
+                <span class="pagination-current">
+                    {{ num }}
+                </span>
+
+            {% else %}
+
+                <a
+                    class="pagination-link"
+                    href="?page={{ num }}"
+                >
+                    {{ num }}
+                </a>
+
+            {% endif %}
+
+        {% endfor %}
+
+
+        <!-- Next -->
+        {% if page_obj.has_next %}
+
+            <a
+                class="pagination-link"
+                href="?page={{ page_obj.next_page_number }}"
+            >
+                Next &rarr;
+            </a>
+
+        {% endif %}
+
+    </div>
+
+    {% endif %}
+
+</section>
+
+{% endblock %}
+

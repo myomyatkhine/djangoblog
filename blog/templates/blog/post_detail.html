@@ -1,0 +1,29 @@
+{% extends "blog/base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<h1>{{ post.title }}</h1>
+{% if post.category %}
+ <div class="category">
+      {{ post.category.name }}
+      </div>
+{% endif %}
+      <div class="content">
+          {{ post.content }}
+      </div>
+{% if post.tags.all %}
+         <div class="tags">
+    {% for tag in post.tags.all %}
+        <span class="tag">
+         #{{ tag.name }}
+         </span>
+    {% endfor %}
+      </div>
+{% endif %}
+      <a class="back" href="/">
+          ← Back to Home
+       </a>
+       {% if post.cover_image %}
+       <img src="{{ post.cover_image.url }}" class="card_image_top" alt="{{ post.title }}">
+        {% endif %}
+{% endblock %}                                                                                                                             
+ 
