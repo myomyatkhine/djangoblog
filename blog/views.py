@@ -8,7 +8,19 @@ from django.views.generic.edit import (
     DeleteView
 )
 from django.urls import reverse_lazy
+from django.contrib.auth import login
+from django.views.generic.edit import CreateView
+from .forms import PostForm, RegisterForm
 
+class RegisterView(CreateView):
+    form_class = RegisterForm
+    template_name = "blog/register.html"
+    success_url = "/"
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        login(self.request, self.object)
+        return response
 
 class PostUpdateView(UpdateView):
 
