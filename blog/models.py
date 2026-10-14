@@ -1,6 +1,9 @@
 from django.db import models
+from django.conf import settings
 from django.utils.text import slugify
 from PIL import Image
+import uuid
+
 
 class Category(models.Model):
 
@@ -35,6 +38,12 @@ class Post(models.Model):
         upload_to="post_covers/",
         blank=True,
         null=True
+    )
+
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="posts"
     )
 
     category = models.ForeignKey(
@@ -78,17 +87,7 @@ class Post(models.Model):
     def save(self, *args, **kwargs):
 
         if not self.slug:
-            self.slug = slugify(self.title)
-
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.title
-
-
-def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.title)
+            self.slug = self._generate_unique_slug()
 
         super().save(*args, **kwargs)
 
@@ -99,3 +98,19 @@ def save(self, *args, **kwargs):
             if img.height > 800 or img.width > 800:
                 img.thumbnail((800, 800))
                 img.save(img_path)
+
+    def _generate_unique_slug(self):
+        # slugify() drops non-ASCII text (e.g. Burmese), so fall back to a
+        # short random id when nothing is left.
+        base = slugify(self.title) or f"post-{uuid.uuid4().hex[:8]}"
+        slug = base
+        n = 2
+
+        while Post.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+            slug = f"{base}-{n}"
+            n += 1
+
+        return slug
+
+    def __str__(self):
+        return self.title
